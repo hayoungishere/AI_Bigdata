@@ -16,14 +16,14 @@ class TransportationProblem(util.SearchProblem):
         results = []
         
         # Walk action
-        if _X_:
+        if not self.is_end(state+1):
             next_state = state + 1
             action = 'Walk'
             cost = 1
             results.append((action, next_state, cost))
             
         # Tram action
-        if _X_:
+        if self.is_end(state*2):
             next_state = 2 * state
             action = 'Tram'
             cost = 2

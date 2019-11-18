@@ -37,15 +37,15 @@ distances = {
 if __name__ == '__main__':
     problem = GraphProblem(states, distances)
 
-    # import backtracking_search
-    # bts = backtracking_search.BacktrackingSearch(verbose=3)
-    # print(bts.solve(problem))
+    import backtracking_search
+    bts = backtracking_search.BacktrackingSearch(verbose=3)
+    print(bts.solve(problem))
 
     # import dynamic_programming_search
     # dps = dynamic_programming_search.DynamicProgrammingSearch(verbose=1)
     # dps = dynamic_programming_search.DynamicProgrammingSearch(memory_use=False, verbose=1)
     # print(dps.solve(problem))
 
-    import uniform_cost_search
-    ucs = uniform_cost_search.UniformCostSearch(verbose=3)
-    print(ucs.solve(problem))
+    # import uniform_cost_search
+    # ucs = uniform_cost_search.UniformCostSearch(verbose=3)
+    # print(ucs.solve(problem))

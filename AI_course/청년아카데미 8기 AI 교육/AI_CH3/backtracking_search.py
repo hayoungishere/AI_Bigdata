@@ -12,28 +12,32 @@ class BacktrackingSearch(util.SearchAlgorithm):
         self.num_visited += 1
         
         # Check end condition
-        if self.problem.is_end(_X_):
+        if self.problem.is_end(state):
             if self.verbose >= 1:
                 print('... new path %s [%d]'%(path, path_cost))
-            if self.best_path is None or _X_:  # compare path_cost with self.best_path_cost
-                self.best_path, self.best_path_cost = _X_  # update best_path & best_path_cost
+
+            if self.best_path is None or (self.best_path_cost>path_cost):  # compare path_cost with self.best_path_cost
+                self.best_path, self.best_path_cost = path, path_cost # update best_path & best_path_cost
+
         
         # Find minimum cost path
         else:
+            # Keep Traversing...
             for action, next_state, action_cost in self.problem.succ_and_cost(state):
-                _X_  # extend path: use list.append
+                path.append(action)  # extend path: use list.append
                 extended_path_cost = path_cost + action_cost
-                self.recurrence(next_state, path, extended_path_cost)
-                _X_  # recover path: use list.pop
+                self.recurrence(next_state, path.copy(), extended_path_cost) # add 'path.copy' for memory copy
+                path.pop()  # recover path: use list.pop
+
 
     def solve(self, problem):
         # Not thread-safe
         self.problem = problem
-        self.num_visited = 0
+        self.num_visited = 0 # 몇 번 방문했는지를 저장
         self.best_path, self.best_path_cost = None, None
         
         initial_state = problem.start_state()
         empty_path = []
         self.recurrence(initial_state, empty_path, 0)
-        
+
         return self.best_path, self.best_path_cost, self.num_visited
