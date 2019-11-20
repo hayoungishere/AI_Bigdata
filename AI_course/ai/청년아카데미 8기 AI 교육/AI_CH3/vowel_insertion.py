@@ -19,7 +19,7 @@ class VowelInsertionProblem(util.SearchProblem):
         result=[]
         pos, prev_word =state[0], state[1]
         vowel_removed_word = self.queryWords[pos]
-        fills = self.possibleFills(vowel_removed_word) | {vowel_removed_word}
+        fills = self.possibleFills(vowel_removed_word) | {vowel_removed_word} # set union 연산.
 
 
         for fill in fills: # fills is action.
@@ -28,19 +28,37 @@ class VowelInsertionProblem(util.SearchProblem):
             result.append((fill, next_state, cost))  # action, next_state, cost
         return result
 
-if __name__ == '__main__':    
+if __name__ == '__main__':
+    QUERIES_INS = [
+        'strng',
+        'pls',
+        'hll thr',
+        'whats up',
+        'dudu and the prince',
+        'frog and the king',
+        'ran with the queen and swam with jack',
+        'light bulbs need change',
+        'ffcr nd prnc ndrw',
+        'ffcr nd shrt prnc',
+        'ntrntnl',
+        'smthng',
+        'btfl',
+        'thts m n th crnr',
+    ]
     unigramCost, bigramCost = wordsegUtil.makeLanguageModels('leo-will.txt')
     possibleFills = wordsegUtil.makeInverseRemovalDictionary('leo-will.txt', 'aeiou') # 모음을 제거한 단어들을 학습 시켜서 어떤 모음이 들어가는 것이 가장 자연스러운지를 찾아냄.
-    problem = VowelInsertionProblem('thts m n th crnr'.split(), bigramCost, possibleFills)
 
-    import dynamic_programming_search
-    dps = dynamic_programming_search.DynamicProgrammingSearch(verbose=1)
-    # dps = dynamic_programming_search.DynamicProgrammingSearch(memory_use=False, verbose=1)
-    # print dps.solve(problem)
+    for q in QUERIES_INS:
+        problem = VowelInsertionProblem(q.split(), bigramCost, possibleFills)
 
-    import uniform_cost_search
-    ucs = uniform_cost_search.UniformCostSearch(verbose=0)
-    print(ucs.solve(problem))
+        import dynamic_programming_search
+        dps = dynamic_programming_search.DynamicProgrammingSearch(verbose=1)
+        # dps = dynamic_programming_search.DynamicProgrammingSearch(memory_use=False, verbose=1)
+        # print dps.solve(problem)
+
+        import uniform_cost_search
+        ucs = uniform_cost_search.UniformCostSearch(verbose=0)
+        print(ucs.solve(problem))
 
 
 # === Other Examples ===

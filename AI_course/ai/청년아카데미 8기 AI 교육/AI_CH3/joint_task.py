@@ -1,5 +1,5 @@
-import util
-import wordsegUtil
+import AI_CH3.util as util
+import AI_CH3.wordsegUtil as wordsegUtil
 
 
 class JointSegmentationInsertionProblem(util.SearchProblem):
@@ -16,7 +16,14 @@ class JointSegmentationInsertionProblem(util.SearchProblem):
         return state[0] == len(self.query)
 
     def succ_and_cost(self, state):
-        raise NotImplementedError
+        result = []
+        for step in range(1, len(self.query) - state + 1):
+            next_state = state + step
+            word = self.query[state:next_state]
+            cost = self.unigramCost(word)
+
+            result.append((word, next_state, cost))  # action, next_state, cost
+        return result
 
 
 # === Other Examples ===
