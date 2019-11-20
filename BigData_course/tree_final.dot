@@ -1,0 +1,20 @@
+digraph Tree {
+node [shape=box, style="filled", color="black"] ;
+0 [label="ROLLING_TEMP_T5 <= 1000.5\ngini = 0.433\nsamples = 499\nvalue = [341, 158]\nclass = Good", fillcolor="#f1bb95"] ;
+1 [label="HSB_적용 <= 0.5\ngini = 0.236\nsamples = 395\nvalue = [341, 54]\nclass = Good", fillcolor="#e99558"] ;
+0 -> 1 [labeldistance=2.5, labelangle=45, headlabel="True"] ;
+2 [label="gini = 0.0\nsamples = 21\nvalue = [0, 21]\nclass = Bad", fillcolor="#399de5"] ;
+1 -> 2 ;
+3 [label="FUR_EXTEMP <= 1175.5\ngini = 0.161\nsamples = 374\nvalue = [341, 33]\nclass = Good", fillcolor="#e88d4c"] ;
+1 -> 3 ;
+4 [label="FUR_TIME <= 228.5\ngini = 0.095\nsamples = 359\nvalue = [341, 18]\nclass = Good", fillcolor="#e68843"] ;
+3 -> 4 ;
+5 [label="gini = 0.5\nsamples = 4\nvalue = [2, 2]\nclass = Good", fillcolor="#ffffff"] ;
+4 -> 5 ;
+6 [label="gini = 0.086\nsamples = 355\nvalue = [339, 16]\nclass = Good", fillcolor="#e68742"] ;
+4 -> 6 ;
+7 [label="gini = 0.0\nsamples = 15\nvalue = [0, 15]\nclass = Bad", fillcolor="#399de5"] ;
+3 -> 7 ;
+8 [label="gini = 0.0\nsamples = 104\nvalue = [0, 104]\nclass = Bad", fillcolor="#399de5"] ;
+0 -> 8 [labeldistance=2.5, labelangle=-45, headlabel="False"] ;
+}
