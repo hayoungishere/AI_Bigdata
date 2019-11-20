@@ -16,18 +16,21 @@ class VowelInsertionProblem(util.SearchProblem):
         return state[0] == len(self.queryWords)
 
     def succ_and_cost(self, state):
-        pos, prev_word = state
+        result=[]
+        pos, prev_word =state[0], state[1]
         vowel_removed_word = self.queryWords[pos]
         fills = self.possibleFills(vowel_removed_word) | {vowel_removed_word}
-        for fill in fills:
-            next_state = _X_
-            cost = self.bigramCost(prev_word, fill)
-            yield fill, next_state, cost  # return action, state, cost
 
+
+        for fill in fills: # fills is action.
+            next_state = (pos+1, fill, prev_word)
+            cost = self.bigramCost(prev_word, fill) # 이전 단어에 비해서 얼마나 자연스러워졌는지를 확인할 수 있음.
+            result.append((fill, next_state, cost))  # action, next_state, cost
+        return result
 
 if __name__ == '__main__':    
     unigramCost, bigramCost = wordsegUtil.makeLanguageModels('leo-will.txt')
-    possibleFills = wordsegUtil.makeInverseRemovalDictionary('leo-will.txt', 'aeiou')
+    possibleFills = wordsegUtil.makeInverseRemovalDictionary('leo-will.txt', 'aeiou') # 모음을 제거한 단어들을 학습 시켜서 어떤 모음이 들어가는 것이 가장 자연스러운지를 찾아냄.
     problem = VowelInsertionProblem('thts m n th crnr'.split(), bigramCost, possibleFills)
 
     import dynamic_programming_search
