@@ -1,6 +1,7 @@
 import AI_CH3.util as util
 import AI_CH3.wordsegUtil as wordsegUtil
 
+_X_ = None
 
 class JointSegmentationInsertionProblem(util.SearchProblem):
     def __init__(self, query, bigramCost, possibleFills):
@@ -16,14 +17,16 @@ class JointSegmentationInsertionProblem(util.SearchProblem):
         return state[0] == len(self.query)
 
     def succ_and_cost(self, state):
-        result = []
-        for step in range(1, len(self.query) - state + 1):
-            next_state = state + step
-            word = self.query[state:next_state]
-            cost = self.unigramCost(word)
-
-            result.append((word, next_state, cost))  # action, next_state, cost
-        return result
+        results = []
+        position, prev_word = state
+        for l in range(1, len(self.query) - position + 1):
+            candidate_words = self.possibleFills(self.query[position:position+l])
+            for word in candidate_words:
+                action = word
+                new_state = (position+l, word)
+                cost = self.bigramCost(prev_word, word)
+                results.append((action, new_state, cost))
+        return results
 
 
 # === Other Examples ===
@@ -87,7 +90,7 @@ if __name__ == '__main__':
     ucs = uniform_cost_search.UniformCostSearch(verbose=0)
 
     num_wrong_pred = 0
-    for query, answer in zip(QUERIES_BOTH, ANSWERS * 10):
+    for query, answer in zip(QUERIES_BOTH, ANSWERS):
         problem = JointSegmentationInsertionProblem(wordsegUtil.removeAll(query, 'aeiou'), smoothCost, possibleFills)
         prediction = ucs.solve(problem)
         # print(prediction)
@@ -100,6 +103,4 @@ if __name__ == '__main__':
         print('Prediction: {}'.format(prediction))
         print('Answer: {}'.format(answer))
         print()
-
     print('Total of {} wrong predictions'.format(num_wrong_pred))
-

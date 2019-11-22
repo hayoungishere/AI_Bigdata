@@ -1,6 +1,7 @@
-import util, math, random
+import AI_CH4.util as util
+import math, random
 from collections import defaultdict
-from util import ValueIteration
+from AI_CH4.util import ValueIteration
 
 ############################################################
 # Problem A
@@ -17,14 +18,15 @@ class ExampleMDP(util.MDP):
     # coming out of |state|.
     def succAndProbReward(self, state, action):
         if state == -2 or state == 2:
+            # Check isEnd
             return []
         
-        leftReward = -5
-        rightReward = -5
+        leftReward = -5 # default reward of left_side
+        rightReward = -5 # default reward of right_side
 
-        if state - 1 == -2:
+        if state - 1 == -2: # state - 1  means current position's left side
             leftReward = 20
-        if state + 1 == 2:
+        if state + 1 == 2: # state + 1 means current position's right side
             rightReward = 100
         
         if action == 'Left':
@@ -39,16 +41,23 @@ class ExampleMDP(util.MDP):
     def discount(self):
         return 1
 
-"""
+'''
 print('\n========== Problem A ==========')
-mdp = ExampleMDP()
+mdp = ExampleMDP() # make instance
 algorithm = ValueIteration()
 algorithm.solve(mdp, 20, verbose=True) # for just 2 iterations
 for i in [-2, -1, 0, 1, 2]:
-    print "Value of the state '%d' : %f"%(i, algorithm.V[i])
+    print ("Value of the state '%d' : %f"%(i, algorithm.V[i])) # V[i] is dictionary key : state, value : value of each actions and state
 for i in [-1, 0, 1]:
-    print("Policy at the state '%d' : %s"%(i, algorithm.pi[i]))
-"""
+    print("Policy at the state '%d' : %s"%(i, algorithm.pi[i])) # pi[i] is dictionary key :state, value : optimal policy
+
+print('\n end -----------------------------------------------------------')
+algorithm.solve(mdp, verbose=True)
+for i in [-2, -1, 0, 1, 2]:
+    print ("Value of the state '%d' : %f"%(i, algorithm.V[i])) # V[i] is dictionary key : state, value : value of each actions and state
+for i in [-1, 0, 1]:
+    print("Policy at the state '%d' : %s"%(i, algorithm.pi[i])) # pi[i] is dictionary key :state, value : optimal policy
+'''
 
 ############################################################
 # Problem C
@@ -89,13 +98,87 @@ class BlackjackMDP(util.MDP):
     # in the list returned by succAndProbReward.
     def succAndProbReward(self, state, action):
         # BEGIN_YOUR_CODE
-        raise Exception("Not implemented yet")
+
+        sumValue, peekIndex, deckState = state
+
+        # step1. 종료 조건인지 확인하기
+        if deckState is None :
+            return []
+
+        result = []
+
+        if action == "Take":
+            if peekIndex is None:
+                for cardindex, cardCount in enumerate(deckState):
+
+                    if cardCount==0:
+                        continue
+
+                    deckList = list(deckState)
+                    deckList[cardindex]-=1
+                    deckTuple = tuple(deckList)
+
+                    newValue = sumValue + self.cardValues[cardindex]
+                    prob = cardCount/sum(deckState)
+                    reward =0
+
+                    if newValue > self.threshold:
+                        deckTuple=None
+                    elif sum(deckTuple) ==0 :
+                        deckTuple=None; reward = newValue
+
+
+                    nextState = (newValue,None,deckTuple)
+                    result.append((nextState, prob, reward))
+
+
+            else:
+                    # existing peekIndex
+                    # update deck state
+                deckList = list(deckState)
+                deckList[peekIndex] -= 1
+                deckTuple = tuple(deckList)
+                newValue = sumValue + self.cardValues[peekIndex]
+
+                prob = 1
+                reward = 0
+
+                if newValue > self.threshold:
+                    deckTuple=None
+                elif sum(deckTuple) == 0 :
+                    deckTuple=None; reward=newValue
+
+                nextState=(newValue,None,deckTuple)
+                result.append((nextState, prob, reward))
+
+
+        elif action =="Peek":
+            sumValue, peekIndex, deckState = state
+
+            if peekIndex is None:
+                for cardIndex, cardCount in enumerate(deckState):
+                    if cardCount==0 :
+                        continue
+                    prob = cardCount/sum(deckState)
+                    nextState=(sumValue, cardIndex, deckState)
+                    reward = -self.peekCost
+
+                    result. append ((nextState, prob, reward))
+
+        elif action == "Quit":
+            nextState=(sumValue, peekIndex, None)
+            prob=1
+            reward = sumValue
+            result.append((nextState, prob, reward))
+
+
+        return result
         # END_YOUR_CODE
 
     def discount(self):
         return 1
 
-"""
+'''
 print('\n========== Problem C ==========')
 mdp1 = BlackjackMDP(cardValues=[1, 5], multiplicity=2, threshold=10, peekCost=1)
 startState = mdp1.startState()
@@ -104,7 +187,8 @@ postBustState = (11, None, None)
 
 mdp2 = BlackjackMDP(cardValues=[1, 5], multiplicity=2, threshold=15, peekCost=1)
 preEmptyState = (11, None, (1,0))
-
+'''
+'''
 print('\n---------- Test c1 ----------')
 # Make sure the succAndProbReward function is implemented correctly.
 
@@ -127,7 +211,7 @@ for no, (answer, mdp, state, action) in enumerate(vanilla_tests):
     print('- state: {}, action: {}'.format(state, action))
     print('- true answer =', answer)
     print('- your answer =', mdp.succAndProbReward(state, action))
-"""
+'''
 """
 print('\n---------- Test c2 ----------')
 peek_tests = [
@@ -147,7 +231,7 @@ for no, (answer, mdp, state, action) in enumerate(peek_tests):
     print('- true answer =', answer)
     print('- your answer = ', mdp.succAndProbReward(state, action))
 """
-"""
+'''
 print('\n---------- Test c3 ----------')
 algorithm = ValueIteration()
 algorithm.solve(mdp1, verbose=True)
@@ -159,8 +243,7 @@ for s in algorithm.pi:
 print('------------')
 print('Q1 (6, None, (1, 1) => %s'%(algorithm.pi[(6, None, (1, 1))]))
 print('Q2 (6, 0, (1, 1) => %s'%(algorithm.pi[(6, 0, (1, 1))]))
-"""
-
+'''
 ############################################################
 
 # Problem D: Q learning
@@ -175,16 +258,16 @@ class QLearningAlgorithm(util.RLAlgorithm):
     def __init__(self, actions, discount, featureExtractor, explorationProb=0.2):
         self.actions = actions
         self.discount = discount
-        self.featureExtractor = featureExtractor
+        self.featureExtractor = featureExtractor #(feature, value)
         self.explorationProb = explorationProb
-        self.weights = defaultdict(float)
+        self.weights = defaultdict(float) # key : feature, value : weight
         self.numIters = 0
 
     # Return the Q function associated with the weights and features
     def getQ(self, state, action):
         score = 0
         for f, v in self.featureExtractor(state, action):
-            score += self.weights[f] * v
+            score += self.weights[f] * v #inner product
         return score
 
     # This algorithm will produce an action given a state.
@@ -207,7 +290,18 @@ class QLearningAlgorithm(util.RLAlgorithm):
     # self.getQ() to compute the current estimate of the parameters.
     def incorporateFeedback(self, state, action, reward, newState):
         # BEGIN_YOUR_CODE (our solution is 12 lines of code, but don't worry if you deviate from this)
-        raise Exception("Not implemented yet")
+
+        if newState is None:
+            vOpt=0
+        else:
+            vOpt = max(self.getQ(newState,a) for a in self.actions(newState)) # next step's q value
+
+        error = self.getQ(state,action)-(self.discount*vOpt+reward)
+        phi = self.featureExtractor(state,action) # feature vector
+
+        for feature, value in phi:
+            self.weights[feature]-=self.getStepSize()*error*value
+
         # END_YOUR_CODE
 
 # Return a singleton list containing indicator feature for the (state, action)
@@ -217,7 +311,7 @@ def identityFeatureExtractor(state, action):
     featureValue = 1
     return [(featureKey, featureValue)]
 
-"""
+'''
 print('\n========== Problem D ==========')
 mdp = util.NumberLineMDP()
 rl = QLearningAlgorithm(mdp.actions, mdp.discount(), identityFeatureExtractor, 0)
@@ -241,7 +335,7 @@ rl.incorporateFeedback(2, -1, 1, 1)
 print('Incorporate the feedback of (s=2, a=-1, r=1, s\'=1)')
 print('Q-value for (state = 2, action = -1) : Answer %.1f, Output %.1f'%(1.9, rl.getQ(2, -1)))
 print('Q-value for (state = 2, action =  1) : Answer %.1f, Output %.1f'%(0, rl.getQ(2, 1)))
-"""
+'''
 
 ############################################################
 

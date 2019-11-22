@@ -21,6 +21,7 @@ class ValueIteration(MDPAlgorithm):
     The ValueIteration class is a subclass of util.MDPAlgorithm (see util.py).
     '''
     def solve(self, mdp, epsilon=0.001, verbose=False):
+        # epsilon < |previous value - current value|
         mdp.computeStates()  # compute set of states reachable from startState
         def computeQ(mdp, V, state, action):
             # Return Q(state, action) based on V(state).
@@ -34,14 +35,17 @@ class ValueIteration(MDPAlgorithm):
                 if verbose:
                     print('state', state, mdp.actions(state), [computeQ(mdp, V, state, action) for action in mdp.actions(state)])
                 pi[state] = max((computeQ(mdp, V, state, action), action) for action in mdp.actions(state))[1]
+                # max((computeQ(mdp,V,state,action), action) for action in mdp.actions(state)) return tuple of (value, action).
+                # but we need only "action", so Just get index 1's value(action)
             return pi
 
-        V = collections.defaultdict(float)  # state -> value of state
+        V = collections.defaultdict(float)  # key : state -> value : value of state
         numIters = 0
         while True:
             newV = {}
             for state in mdp.states:
-                newV[state] = max(computeQ(mdp, V, state, action) for action in mdp.actions(state))
+                # V is previous value, state is current state
+                newV[state] = max(computeQ(mdp, V, state, action) for action in mdp.actions(state)) #list comprehension
             numIters += 1
             if max(abs(V[state] - newV[state]) for state in mdp.states) < epsilon:
                 V = newV
