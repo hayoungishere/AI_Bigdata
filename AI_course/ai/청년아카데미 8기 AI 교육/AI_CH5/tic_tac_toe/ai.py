@@ -8,7 +8,19 @@ import random
 class MinimaxAgent:
     def V(self, state):
         # BEGIN_YOUR_CODE
-        raise Exception("Not implemented yet")
+        if game.is_end(state):
+            return game.utility(state)
+
+        if game.get_player_from_state(state) == game.MAX_PLAYER:  # my-turn
+            value = -game.INT_INF
+            for action in game.get_possible_actions(state):
+                value = max(value, self.V(game.get_next_state(state, action)))
+        else:  # opp-turn
+            value = game.INT_INF
+            for action in game.get_possible_actions(state):
+                value = min(value, self.V(game.get_next_state(state, action)))
+
+        return value
         # END_YOUR_CODE
 
     def policy(self, state):
@@ -25,7 +37,20 @@ class MinimaxAgent:
 class PruningMinimaxAgent:
     def V(self, state, alpha=-game.INT_INF, beta=game.INT_INF):
         # BEGIN_YOUR_CODE
-        raise Exception("Not implemented yet")
+        if game.is_end(state):
+            return game.utility(state)
+
+        actions = game.get_possible_actions(state)
+        if game.get_player_from_state(state) == game.MAX_PLAYER:  # my-turn
+            value = -game.INT_INF
+            for action in actions:
+                value = max(value, self.V(game.get_next_state(state, action)))
+        else:  # opp-turn
+            value = 0
+            for action in actions:
+                value += self.V(game.get_next_state(state, action)) / len(actions)
+
+        return value
         # END_YOUR_CODE
 
     def policy(self, state):
@@ -80,7 +105,21 @@ class DepthLimitedMinimaxAgent:
 
     def V(self, state, depth):
         # BEGIN_YOUR_CODE
-        raise Exception("Not implemented yet")
+        if game.is_end(state):
+            return game.utility(state)
+        if depth ==0:
+            return eval(state)
+
+        if game.get_player_from_state(state) == game.MAX_PLAYER:  # my-turn
+            value = -game.INT_INF
+            for action in game.get_possible_actions(state):
+                value = max(value, self.V(game.get_next_state(state, action),depth))
+        else:  # opp-turn
+            value = game.INT_INF
+            for action in game.get_possible_actions(state):
+                value = min(value, self.V(game.get_next_state(state, action), depth-1))
+
+        return value
         # END_YOUR_CODE
 
     def policy(self, state):
